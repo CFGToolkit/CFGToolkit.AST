@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <Version>1.0.0-alfa-2</Version>
+    <Authors>Marcin Gołębiowski</Authors>
+    <Description>An abstract syntax trees library for .NET</Description>
+    <PackageProjectUrl>https://github.com/CFGToolkit/CFGToolkit.AST</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CFGToolkit/CFGToolkit.AST</RepositoryUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+</Project>
