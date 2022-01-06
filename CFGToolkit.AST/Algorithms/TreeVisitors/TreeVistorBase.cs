@@ -4,8 +4,6 @@ namespace CFGToolkit.AST.Algorithms.TreeVisitors
 {
     public abstract class TreeVistorBase : ITreeVistor
     {
-        protected Func<ISyntaxElement, bool> AcceptFactory { get; set; }
-
         public void Visit(SyntaxTree tree)
         {
             if (tree is null)

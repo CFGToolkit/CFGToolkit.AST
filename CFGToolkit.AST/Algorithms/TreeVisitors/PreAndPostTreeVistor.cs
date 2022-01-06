@@ -2,13 +2,16 @@
 
 namespace CFGToolkit.AST.Algorithms.TreeVisitors
 {
-    public class PreOrderTreeVistor : TreeVistorBase
+    public class PreAndPostTreeVistor : TreeVistorBase
     {
         protected Func<ISyntaxElement, bool> PreAcceptFactory { get; set; }
 
-        public PreOrderTreeVistor(Func<ISyntaxElement, bool> preAcceptFactory)
+        protected Action<ISyntaxElement> PostAcceptFactory { get; set; }
+
+        public PreAndPostTreeVistor(Func<ISyntaxElement, bool> preAcceptFactory, Action<ISyntaxElement> postAcceptFactory)
         {
             PreAcceptFactory = preAcceptFactory;
+            PostAcceptFactory = postAcceptFactory;
         }
 
         public override void Visit(SyntaxNode node)
@@ -17,15 +20,19 @@ namespace CFGToolkit.AST.Algorithms.TreeVisitors
             {
                 return;
             }
+
             foreach (var child in node.Children)
             {
                 Visit(child);
             }
+
+            PostAcceptFactory(node);
         }
 
         public override void Visit(SyntaxToken token)
         {
             PreAcceptFactory(token);
+            PostAcceptFactory(token);
         }
 
         public override void Visit(SyntaxNodeOption option)
@@ -39,6 +46,8 @@ namespace CFGToolkit.AST.Algorithms.TreeVisitors
             {
                 Visit(option.Inside);
             }
+
+            PostAcceptFactory(option);
         }
 
         public override void Visit(SyntaxNodeMany many)
@@ -52,6 +61,8 @@ namespace CFGToolkit.AST.Algorithms.TreeVisitors
             {
                 Visit(instance);
             }
+
+            PostAcceptFactory(many);
         }
     }
 }
