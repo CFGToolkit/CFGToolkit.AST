@@ -6,7 +6,7 @@ namespace CFGToolkit.AST.Providers
     {
         public static string Text(this SyntaxNode node)
         {
-            bool tokenize = node.Attributes.ContainsKey("tokenize");
+            bool tokenize = node.Attributes?.ContainsKey("tokenize") ?? false;
 
             var tokens = TokenProvider.GetTokens(node);
 

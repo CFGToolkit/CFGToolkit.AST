@@ -10,7 +10,7 @@ namespace CFGToolkit.AST.Providers
         {
             var list = new List<SyntaxToken>();
 
-            Func<ISyntaxElement, bool> accept = (element) =>
+            Func<ISyntaxElement, int, bool> accept = (element, depth) =>
             {
                 if (element is SyntaxToken token)
                 {
@@ -21,7 +21,7 @@ namespace CFGToolkit.AST.Providers
             };
 
             var vistor = new Algorithms.TreeVisitors.PostOrderTreeVistor(accept);
-            vistor.Visit(node);
+            vistor.Visit(node, 0);
 
             return list;
         }
@@ -30,7 +30,7 @@ namespace CFGToolkit.AST.Providers
         {
             var list = new List<SyntaxToken>();
 
-            Func<ISyntaxElement, bool> accept = (element) =>
+            Func<ISyntaxElement, int, bool> accept = (element, depth) =>
             {
                 if (element is SyntaxToken token)
                 {
@@ -42,7 +42,7 @@ namespace CFGToolkit.AST.Providers
             };
 
             var vistor = new Algorithms.TreeVisitors.PostOrderTreeVistor(accept);
-            vistor.Visit(node);
+            vistor.Visit(node, 0);
 
             return list.FirstOrDefault();
         }

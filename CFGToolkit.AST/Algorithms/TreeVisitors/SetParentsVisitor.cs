@@ -2,40 +2,40 @@
 {
     public class SetParentsVisitor : TreeVistorBase
     {
-        public override void Visit(SyntaxNode node)
+        public override void Visit(SyntaxNode node, int currentDepth)
         {
             if (node?.Children != null)
             {
                 foreach (var child in node.Children)
                 {
                     child.Parent = node;
-                    Visit(child);
+                    Visit(child, currentDepth + 1);
                 }
             }
         }
 
-        public override void Visit(SyntaxNodeMany many)
+        public override void Visit(SyntaxNodeMany many, int currentDepth)
         {
             if (many?.Repeated != null)
             {
                 foreach (var child in many.Repeated)
                 {
                     child.Parent = many;
-                    Visit(child);
+                    Visit(child, currentDepth + 1);
                 }
             }
         }
 
-        public override void Visit(SyntaxNodeOption option)
+        public override void Visit(SyntaxNodeOption option, int currentDepth)
         {
             if (option?.Inside != null)
             {
                 option.Inside.Parent = option;
-                Visit(option.Inside);
+                Visit(option.Inside, currentDepth + 1);
             }
         }
 
-        public override void Visit(SyntaxToken token)
+        public override void Visit(SyntaxToken token, int currentDepth)
         {
         }
     }

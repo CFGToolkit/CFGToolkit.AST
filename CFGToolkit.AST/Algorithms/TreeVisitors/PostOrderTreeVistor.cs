@@ -4,52 +4,52 @@ namespace CFGToolkit.AST.Algorithms.TreeVisitors
 {
     public class PostOrderTreeVistor : TreeVistorBase
     {
-        protected Func<ISyntaxElement, bool> PostAcceptFactory { get; set; }
+        protected Func<ISyntaxElement, int, bool> PostAcceptFactory { get; set; }
 
-        public PostOrderTreeVistor(Func<ISyntaxElement, bool> acceptFactory)
+        public PostOrderTreeVistor(Func<ISyntaxElement, int, bool> acceptFactory)
         {
             PostAcceptFactory = acceptFactory;
         }
 
-        public override void Visit(SyntaxNode node)
+        public override void Visit(SyntaxNode node, int currentDepth)
         {
             foreach (var child in node.Children)
             {
-                Visit(child);
+                Visit(child, currentDepth + 1);
             }
 
-            if (!PostAcceptFactory(node))
+            if (!PostAcceptFactory(node, currentDepth))
             {
                 return;
             }
         }
 
-        public override void Visit(SyntaxToken token)
+        public override void Visit(SyntaxToken token, int currentDepth)
         {
-            PostAcceptFactory(token);
+            PostAcceptFactory(token, currentDepth);
         }
 
-        public override void Visit(SyntaxNodeOption option)
+        public override void Visit(SyntaxNodeOption option, int currentDepth)
         {
             if (!option.IsEmpty)
             {
-                Visit(option.Inside);
+                Visit(option.Inside, currentDepth + 1);
             }
 
-            if (!PostAcceptFactory(option))
+            if (!PostAcceptFactory(option, currentDepth))
             {
                 return;
             }
         }
 
-        public override void Visit(SyntaxNodeMany many)
+        public override void Visit(SyntaxNodeMany many, int currentDepth)
         {
             foreach (var instance in many.Repeated)
             {
-                Visit(instance);
+                Visit(instance, currentDepth + 1);
             }
 
-            if (!PostAcceptFactory(many))
+            if (!PostAcceptFactory(many, currentDepth))
             {
                 return;
             }

@@ -4,65 +4,65 @@ namespace CFGToolkit.AST.Algorithms.TreeVisitors
 {
     public class PreAndPostTreeVistor : TreeVistorBase
     {
-        protected Func<ISyntaxElement, bool> PreAcceptFactory { get; set; }
+        protected Func<ISyntaxElement, int, bool> PreAcceptFactory { get; set; }
 
-        protected Action<ISyntaxElement> PostAcceptFactory { get; set; }
+        protected Action<ISyntaxElement, int> PostAcceptFactory { get; set; }
 
-        public PreAndPostTreeVistor(Func<ISyntaxElement, bool> preAcceptFactory, Action<ISyntaxElement> postAcceptFactory)
+        public PreAndPostTreeVistor(Func<ISyntaxElement, int, bool> preAcceptFactory, Action<ISyntaxElement, int> postAcceptFactory)
         {
             PreAcceptFactory = preAcceptFactory;
             PostAcceptFactory = postAcceptFactory;
         }
 
-        public override void Visit(SyntaxNode node)
+        public override void Visit(SyntaxNode node, int currentDepth)
         {
-            if (!PreAcceptFactory(node))
+            if (!PreAcceptFactory(node, currentDepth))
             {
                 return;
             }
 
             foreach (var child in node.Children)
             {
-                Visit(child);
+                Visit(child, currentDepth + 1);
             }
 
-            PostAcceptFactory(node);
+            PostAcceptFactory(node, currentDepth);
         }
 
-        public override void Visit(SyntaxToken token)
+        public override void Visit(SyntaxToken token, int currentDepth)
         {
-            PreAcceptFactory(token);
-            PostAcceptFactory(token);
+            PreAcceptFactory(token, currentDepth);
+            PostAcceptFactory(token, currentDepth);
         }
 
-        public override void Visit(SyntaxNodeOption option)
+        public override void Visit(SyntaxNodeOption option, int currentDepth)
         {
-            if (!PreAcceptFactory(option))
+            if (!PreAcceptFactory(option, currentDepth))
             {
                 return;
             }
 
             if (!option.IsEmpty)
             {
-                Visit(option.Inside);
+                Visit(option.Inside, currentDepth + 1);
             }
 
-            PostAcceptFactory(option);
+            PostAcceptFactory(option, currentDepth);
         }
 
-        public override void Visit(SyntaxNodeMany many)
+        public override void Visit(SyntaxNodeMany many, int currentDepth)
         {
-            if (!PreAcceptFactory(many))
+            if (!PreAcceptFactory(many, currentDepth))
             {
                 return;
             }
 
             foreach (var instance in many.Repeated)
             {
-                Visit(instance);
+                Visit(instance, currentDepth + 1);
             }
 
-            PostAcceptFactory(many);
+            PostAcceptFactory(many, currentDepth);
         }
     }
 }

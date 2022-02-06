@@ -5,13 +5,18 @@ namespace CFGToolkit.AST.Providers
 {
     public static class NodeProvider
     {
-        public static List<SyntaxNode> GetNodes(this SyntaxNode node, string name, int lookupDepth)
+        public static List<SyntaxNode> GetNodes(this SyntaxNode parentNode, string nodeName, int lookupDepth)
         {
             var list = new List<SyntaxNode>();
 
-            Func<ISyntaxElement, bool> accept = (element) =>
+            Func<ISyntaxElement, int, bool> accept = (element, depth) =>
             {
-                if (element is SyntaxNode elementNode && elementNode.Name == name && GetDepth(node, elementNode) < lookupDepth)
+                if (depth > lookupDepth)
+                {
+                    return false;
+                }
+
+                if (element is SyntaxNode elementNode && elementNode.Name == nodeName)
                 {
                     list.Add(elementNode);
                 }
@@ -20,22 +25,9 @@ namespace CFGToolkit.AST.Providers
             };
 
             var vistor = new Algorithms.TreeVisitors.PreOrderTreeVistor(accept);
-            vistor.Visit(node);
+            vistor.Visit(parentNode, 0);
 
             return list;
-        }
-
-        private static int GetDepth(SyntaxNode rootNode, SyntaxNode elementNode)
-        {
-            ISyntaxElement tmp = elementNode;
-            int count = 0;
-            while (tmp != null && tmp != rootNode)
-            {
-                count++;
-                tmp = tmp.Parent;
-            }
-
-            return count;
         }
     }
 }
