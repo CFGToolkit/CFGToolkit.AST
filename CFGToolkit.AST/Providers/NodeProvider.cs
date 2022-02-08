@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CFGToolkit.AST.Visitors;
+using CFGToolkit.AST.Visitors.Traversals;
 using System.Collections.Generic;
 
 namespace CFGToolkit.AST.Providers
@@ -7,27 +8,39 @@ namespace CFGToolkit.AST.Providers
     {
         public static List<SyntaxNode> GetNodes(this SyntaxNode parentNode, string nodeName, int lookupDepth)
         {
-            var list = new List<SyntaxNode>();
+            var traversal = new PreOrderTreeTraversal<List<SyntaxNode>>(new NodeFinderVisitor(lookupDepth, nodeName));
+            return traversal.Accept(parentNode, new TreeTraversalContext { Depth = 0 });
+        }
 
-            Func<ISyntaxElement, int, bool> accept = (element, depth) =>
+        public class NodeFinderVisitor : IVisitor<ISyntaxElement, TreeTraversalContext, List<SyntaxNode>>
+        {
+            private List<SyntaxNode> _elements = new List<SyntaxNode>();
+
+            public NodeFinderVisitor(int lookupDepth, string nodeName)
             {
-                if (depth > lookupDepth)
+                LookupDepth = lookupDepth;
+                NodeName = nodeName;
+            }
+
+            public int LookupDepth { get; }
+
+            public string NodeName { get; }
+
+            public List<SyntaxNode> Visit(ISyntaxElement element, TreeTraversalContext context)
+            {
+                if (context.Depth > LookupDepth)
                 {
-                    return false;
+                    context.Continue = false;
+                    return null;
                 }
 
-                if (element is SyntaxNode elementNode && elementNode.Name == nodeName)
+                if (element is SyntaxNode elementNode && elementNode.Name == NodeName)
                 {
-                    list.Add(elementNode);
+                    _elements.Add(elementNode);
                 }
 
-                return true;
-            };
-
-            var vistor = new Algorithms.TreeVisitors.PreOrderTreeVistor(accept);
-            vistor.Visit(parentNode, 0);
-
-            return list;
+                return _elements;
+            }
         }
     }
 }

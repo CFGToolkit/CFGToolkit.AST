@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CFGToolkit.AST.Visitors;
+using CFGToolkit.AST.Visitors.Traversals;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,50 +7,55 @@ namespace CFGToolkit.AST.Providers
 {
     public static class TokenProvider
     {
-        public static List<SyntaxToken> GetTokens(this SyntaxNode node)
+        public class AllTokenFinderVisitor : IVisitor<ISyntaxElement, TreeTraversalContext, List<SyntaxToken>>
         {
-            var list = new List<SyntaxToken>();
+            private List<SyntaxToken> _elements = new List<SyntaxToken>();
 
-            Func<ISyntaxElement, int, bool> accept = (element, depth) =>
+            public AllTokenFinderVisitor()
+            {
+            }
+
+            public List<SyntaxToken> Visit(ISyntaxElement element, TreeTraversalContext context)
             {
                 if (element is SyntaxToken token)
                 {
-                    list.Add(token);
+                    _elements.Add(token);
                 }
 
-                return true;
-            };
+                return _elements;
+            }
+        }
 
-            var vistor = new Algorithms.TreeVisitors.PostOrderTreeVistor(accept);
-            vistor.Visit(node, 0);
+        public class FirstTokenFinderVisitor : IVisitor<ISyntaxElement, TreeTraversalContext, SyntaxToken>
+        {
+            private SyntaxToken _token;
 
-            return list;
+            public FirstTokenFinderVisitor()
+            {
+            }
+
+            public SyntaxToken Visit(ISyntaxElement element, TreeTraversalContext context)
+            {
+                if (element is SyntaxToken token)
+                {
+                    context.Continue = false;
+                    _token = token;
+                }
+
+                return _token;
+            }
+        }
+
+        public static List<SyntaxToken> GetTokens(this SyntaxNode node)
+        {
+            var traversal = new PostOrderTreeTraversal<List<SyntaxToken>>(new AllTokenFinderVisitor());
+            return traversal.Accept(node, new TreeTraversalContext { Depth = 0 });
         }
 
         public static SyntaxToken GetFirstToken(this SyntaxNode node)
         {
-            var list = new List<SyntaxToken>();
-
-            Func<ISyntaxElement, int, bool> accept = (element, depth) =>
-            {
-                if (element is SyntaxToken token)
-                {
-                    list.Add(token);
-                    return false;
-                }
-
-                return true;
-            };
-
-            var vistor = new Algorithms.TreeVisitors.PostOrderTreeVistor(accept);
-            vistor.Visit(node, 0);
-
-            return list.FirstOrDefault();
-        }
-
-        public static SyntaxToken GetLastToken(SyntaxNode node)
-        {
-            return GetTokens(node).LastOrDefault();
+            var traversal = new PostOrderTreeTraversal<SyntaxToken>(new FirstTokenFinderVisitor());
+            return traversal.Accept(node, new TreeTraversalContext { Depth = 0 });
         }
     }
 }
