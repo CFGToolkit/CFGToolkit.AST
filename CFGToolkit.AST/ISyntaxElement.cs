@@ -8,6 +8,6 @@ namespace CFGToolkit.AST
 
         ISyntaxElement Parent { get; set; }
 
-        Dictionary<string, string> Attributes { get; set; }
+        Dictionary<string, object> Attributes { get; set; }
     }
 }

@@ -15,6 +15,6 @@ namespace CFGToolkit.AST
 
         public List<ISyntaxElement> Children { get; set; } = new List<ISyntaxElement>();
 
-        public Dictionary<string, string> Attributes { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
     }
 }
